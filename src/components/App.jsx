@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import axios from 'axios'; 
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
@@ -13,13 +13,16 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSearch = (newQuery) => {
-    setQuery(newQuery);
-    setPage(1);
+  useEffect(() => {
+    if (!query) return;
+
     setImages([]);
-    loadImages(newQuery, 1);
-  };
+    setPage(1);
+
+    loadImages(query, 1);
+  }, [query]);
 
   const loadImages = (query, currentPage) => {
     const API_KEY = '39068391-0e28b65d96db8d37b502b2dfc';
@@ -39,11 +42,15 @@ const App = () => {
         },
       })
       .then((response) => {
-        setImages([...images, ...response.data.hits]);
+        setImages((prevImages) => [...prevImages, ...response.data.hits]);
         setPage(currentPage + 1);
       })
       .catch((error) => console.error('Error:', error))
       .finally(() => setLoading(false));
+  };
+
+  const handleSearch = (newQuery) => {
+    setQuery(newQuery);
   };
 
   const handleLoadMore = () => {
@@ -52,10 +59,12 @@ const App = () => {
 
   const handleImageClick = (largeImageURL) => {
     setSelectedImage(largeImageURL);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setSelectedImage(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -64,7 +73,7 @@ const App = () => {
       <ImageGallery images={images} onImageClick={handleImageClick} />
       {loading && <Loader />}
       {images.length > 0 && <Button onClick={handleLoadMore} disabled={loading} />}
-      {selectedImage && <Modal image={selectedImage} onClose={closeModal} />}
+      {isModalOpen && <Modal image={selectedImage} onClose={closeModal} />}
     </div>
   );
 };

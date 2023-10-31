@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ImageGalleryItem = ({ image, onClick }) => {
+const GalleryItem = ({ image, onClick }) => {
     return (
       <li className="gallery-item">
         <img
@@ -12,4 +12,4 @@ const ImageGalleryItem = ({ image, onClick }) => {
     );
 };
 
-export default ImageGalleryItem;
+export default GalleryItem;
