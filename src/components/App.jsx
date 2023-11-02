@@ -14,12 +14,14 @@ const App = () => {
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [totalHits, setTotalHits] = useState(0);
 
   useEffect(() => {
     if (!query) return;
 
     setImages([]);
     setPage(1);
+    setTotalHits(0);
 
     loadImages(query, 1);
   }, [query]);
@@ -44,6 +46,7 @@ const App = () => {
       .then((response) => {
         setImages((prevImages) => [...prevImages, ...response.data.hits]);
         setPage(currentPage + 1);
+        setTotalHits(response.data.totalHits);
       })
       .catch((error) => console.error('Error:', error))
       .finally(() => setLoading(false));
@@ -72,7 +75,9 @@ const App = () => {
       <Searchbar onSubmit={handleSearch} />
       <ImageGallery images={images} onImageClick={handleImageClick} />
       {loading && <Loader />}
-      {images.length > 0 && <Button onClick={handleLoadMore} disabled={loading} />}
+      {images.length > 0 && images.length < totalHits && (
+        <Button onClick={handleLoadMore} disabled={loading} />
+      )}
       {isModalOpen && <Modal image={selectedImage} onClose={closeModal} />}
     </div>
   );
